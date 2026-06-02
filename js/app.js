@@ -12,6 +12,16 @@ cargaEventListeners();
 
 function cargaEventListeners() {
     listaCursos.addEventListener('click', agregarCurso);
+
+    //Elimina cursos del carrito
+    carrito.addEventListener('click', eliminarCurso)
+
+    //vaciar carrito
+    carrito.addEventListener('click', ()=>{
+        articulosCarrito = [];
+
+        limpiarHTML();
+    })
 }
 
 //funciones
@@ -27,9 +37,25 @@ function agregarCurso(e) {
     
 }
 
+//Eliminar curso del carrito
+function eliminarCurso(e){
+
+    if(e.target.classList.contains('borrar-curso')){
+        const cursoId = e.target.getAttribute('data-id');
+
+        //Elimina articulos del carrito por data-id
+        articulosCarrito = articulosCarrito.filter( curso => curso.id !== cursoId );
+        
+        carritoHTML();
+        
+    }
+
+    
+    
+}
+
 //Lee el contenido del HTML al que le dimos click y extrae la informacion del curso
 function leerDatosCurso(curso){
-    console.log(curso);
     
     //crear un  objeto con el contenido del curso actual
     const infoCurso={
@@ -41,9 +67,31 @@ function leerDatosCurso(curso){
 
     }
 
-    //Agrega elementos al carrito
-    articulosCarrito=[...articulosCarrito, infoCurso];
+    //revisa si un elemento existe en el carrito
+    const existe = articulosCarrito.some( curso => curso.id === infoCurso.id);
+
+    if(existe){
+        //actualizar cantidad+
+        const cursos = articulosCarrito.map( curso => {
+            if(curso.id === infoCurso.id){
+                curso.cantidad++;
+
+                return curso;
+            }else{
+                return curso;
+            }
+        } );
+
+        articulosCarrito =[ ...cursos];
+
+    }else{
+        //Agrega elementos al carrito
+        articulosCarrito=[...articulosCarrito, infoCurso];
+        
+    }
+    
     carritoHTML();
+    
 
 }
 
@@ -54,14 +102,18 @@ function carritoHTML(){
     limpiarHTML();
     
     articulosCarrito.forEach( curso =>{
+
+        const {imagen, titulo, precio, cantidad, id} = curso;
         const row = document.createElement('tr');
         row.innerHTML = `
 
-            <td> <img src="${curso.imagen}" width=100> </td>
-            <td> ${curso.titulo} </td>
-            <td> ${curso.precio} </td>
-            <td> ${curso.cantidad} </td>
-            
+            <td> <img src="${imagen}" width=100> </td>
+            <td> ${titulo} </td>
+            <td> ${precio} </td>
+            <td> ${cantidad} </td>
+            <td>
+                <a hrf="#" class="borrar-curso" data-id="${id}"> X </a>
+            </td>
 
         `;
 
